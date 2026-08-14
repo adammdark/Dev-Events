@@ -80,6 +80,9 @@ const eventSchema = new Schema<EventType>(
       required: [true, "Slug is required."],
       unique: true,
       trim: true,
+      default: function () {
+        return slugify((this as EventDocument).title || "event");
+      },
     },
     description: {
       type: String,
@@ -191,9 +194,7 @@ eventSchema.pre("save", async function () {
     }
   }
 
-  if (eventDoc.isModified("title")) {
-    eventDoc.slug = slugify(eventDoc.title);
-  } else if (!eventDoc.slug || !eventDoc.slug.trim()) {
+  if (eventDoc.isModified("title") || !eventDoc.slug || !eventDoc.slug.trim()) {
     eventDoc.slug = slugify(eventDoc.title);
   }
 
